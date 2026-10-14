@@ -102,14 +102,23 @@
     const ids = new Set(words.map((it) => it[0]));
     store.set(NS + 'used', [...used].filter((id) => ids.has(id)));
 
+    // Impostor: losowanie bez zwracania, każdy gracz ma tę samą szansę.
     const left = names.map((_, i) => i);
     const imps = [];
     const k = impostorsFor(names.length);
     while (imps.length < k) imps.push(left.splice(rand(left.length), 1)[0]);
 
+    // Kolejność podawania telefonu: losowa (tasowanie Fishera-Yatesa).
+    const order = names.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+      const j = rand(i + 1);
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+
     state.game = {
       names,
       imps: imps.sort((a, b) => a - b),
+      order,
       word,
       turn: 0,
       seen: false,
@@ -266,7 +275,7 @@
             <input type="text" name="name" placeholder="Imię" maxlength="${MAX_NAME}" enterkeyhint="done" autocapitalize="words" aria-label="Imię gracza">
             <button type="submit">Dodaj</button>
           </form>
-          <p class="note">Wpisujcie imiona w kolejności, w jakiej siedzicie. W tej kolejności podajecie telefon.</p>
+          <p class="note">Telefon trafia do graczy w losowej kolejności.</p>
         </section>
         <section>
           <h2>Ilu impostorów?</h2>
@@ -337,9 +346,10 @@
   }
 
   function renderReveal(stripe, g) {
-    const i = g.turn;
     const total = g.names.length;
-    const last = i === total - 1;
+    const order = g.order || g.names.map((_, i) => i); // gra zapisana przed tą wersją: po kolei
+    const i = order[g.turn]; // który gracz dostaje teraz telefon
+    const last = g.turn === total - 1;
     const imp = g.imps.includes(i);
     const [, word, hint] = g.word;
 
@@ -353,7 +363,7 @@
         <header class="bar">
           <button class="icon-btn quit" type="button" aria-label="Przerwij grę">${ICON.x}</button>
           <p class="for">Telefon dla</p>
-          <span class="count">${i + 1} z ${total}</span>
+          <span class="count">${g.turn + 1} z ${total}</span>
         </header>
         <p class="name">${esc(g.names[i])}</p>
         <div class="card" tabindex="0" role="button" aria-label="Przytrzymaj, żeby zobaczyć" style="--hold-ms:${HOLD_MS}ms">
