@@ -175,19 +175,39 @@
     return force;
   }
 
-  // Dopasuj wielkość napisu, żeby długie hasło zmieściło się w max 2 linijkach.
-  function fit(el, max = 68, min = 28) {
+  // Dopasuj wielkość napisu, żeby hasło mieściło się w karcie:
+  // na szerokość, w max 2 linijkach i razem z etykietami na wysokość.
+  function fit(el, max = 68, min = 24) {
+    const box = el.closest('.secret'); // karta o stałej wysokości (rozdawanie ról)
+    const fits = (s) => {
+      if (el.scrollWidth > el.clientWidth + 1) return false;
+      // clientHeight = wysokość linijek (scrollHeight dolicza wystające litery)
+      if (el.clientHeight > s * 1.04 * 2 + 2) return false;
+      if (box) {
+        const kids = box.children;
+        const used = kids[kids.length - 1].getBoundingClientRect().bottom - kids[0].getBoundingClientRect().top;
+        const cs = getComputedStyle(box);
+        const room = box.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+        if (used > room) return false;
+      }
+      return true;
+    };
     let s = max;
     el.style.fontSize = s + 'px';
-    // clientHeight = wysokość linijek (scrollHeight dolicza wystające litery)
-    while (s > min && (el.scrollWidth > el.clientWidth + 1 || el.clientHeight > s * 1.04 * 2 + 2)) {
+    while (s > min && !fits(s)) {
       s -= 2;
       el.style.fontSize = s + 'px';
     }
   }
   function fitAll() {
-    $app.querySelectorAll('.s-main').forEach((el) => fit(el));
+    const short = window.innerHeight < 740;
+    $app.querySelectorAll('.s-main').forEach((el) => fit(el, el.closest('.static') && short ? 50 : 68));
   }
+  let fitFrame = 0;
+  const refit = () => {
+    cancelAnimationFrame(fitFrame);
+    fitFrame = requestAnimationFrame(fitAll);
+  };
 
   // ---------- ekrany ----------
 
@@ -345,6 +365,7 @@
     const card = $app.querySelector('.card');
     const next = $app.querySelector('.next');
     holdable(card, () => {
+      fit(card.querySelector('.s-main')); // na wypadek zmiany rozmiaru ekranu
       card.classList.add('open');
     }, () => {
       card.classList.remove('open');
@@ -440,7 +461,14 @@
 
   if (state.game && state.game.phase !== 'result') keepAwake(true);
   render();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+  // Przelicz wielkość hasła po obróceniu telefonu, zmianie paska przeglądarki i wczytaniu czcionki.
+  window.addEventListener('resize', refit);
+  window.addEventListener('orientationchange', refit);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', refit);
+  if (document.fonts) {
+    if (document.fonts.ready) document.fonts.ready.then(refit);
+    if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', refit);
+  }
 
   loadWords()
     .then((items) => { words = items; })

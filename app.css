@@ -349,6 +349,29 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
 .result .who .name { animation: pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
 .actions { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
 
+/* niższe telefony: mniejsze odstępy, żeby karta z hasłem była jak największa */
+@media (max-height: 740px) {
+  .screen { gap: 14px; }
+  .bar { min-height: 44px; }
+  .reveal .who .for, .play .who .for { font-size: 18px; }
+  .reveal .who .name, .result .who .name { font-size: clamp(38px, 12vw, 56px); }
+  .result .who { margin-top: 4px; }
+  .card.static { padding: 18px 18px 20px; gap: 4px; }
+  .actions { gap: 10px; }
+  .big { min-height: 64px; font-size: 28px; }
+  .big.ghost { min-height: 54px; font-size: 22px; }
+  .card { min-height: 190px; border-radius: 28px; }
+  .secret { padding: 16px; gap: 6px; }
+}
+@media (max-height: 580px) {
+  .reveal .who .for { font-size: 16px; }
+  .reveal .who .name { font-size: 36px; }
+  .card { min-height: 160px; }
+  .s-top { font-size: 20px; }
+  .s-top.imp { font-size: 22px; }
+  .s-sub { font-size: 16px; }
+}
+
 @keyframes pop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
