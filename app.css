@@ -24,6 +24,7 @@
   --sun: #FFCB3D;
   --sun-deep: #D99A00;
   --mist: #C8D0FF;
+  --red: #D92B2B;
   --glass: rgba(255, 255, 255, 0.14);
   --line: rgba(255, 255, 255, 0.32);
   --font: 'Baloo 2', ui-rounded, system-ui, sans-serif;
@@ -269,7 +270,26 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
   visibility: hidden;
 }
 .card.open .secret { visibility: visible; }
-.s-top { font-size: 24px; font-weight: 800; color: var(--kobalt); line-height: 1.1; }
+.s-top {
+  display: inline-block;
+  padding: 5px 18px 3px;
+  border-radius: 999px;
+  background: var(--kobalt);
+  color: var(--paper);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+/* czerwień = impostor */
+.s-top.imp { background: var(--red); font-size: 27px; padding: 7px 22px 5px; }
+.result .for.imp {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 18px 2px;
+  border-radius: 999px;
+  background: var(--red);
+  color: var(--paper);
+}
 .s-main { width: 100%; font-size: 68px; font-weight: 800; line-height: 1.04; overflow-wrap: normal; }
 .s-sub { font-size: 19px; font-weight: 600; color: var(--ink-soft); }
 

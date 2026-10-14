@@ -324,7 +324,7 @@
     const [, word, hint] = g.word;
 
     // Oba warianty mają ten sam układ i kolory, różni się tylko treść.
-    const top = imp ? 'Jesteś impostorem' : 'Twoje hasło';
+    const top = imp ? 'Jesteś impostorem!' : 'Twoje hasło';
     const main = imp ? hint : word;
     const sub = imp ? 'to twoja podpowiedź' : 'nie mów go nikomu';
 
@@ -336,7 +336,7 @@
         </header>
         <div class="who"><p class="for">Telefon dla</p><p class="name">${esc(g.names[i])}</p></div>
         <div class="card" tabindex="0" role="button" aria-label="Przytrzymaj, żeby zobaczyć">
-          <div class="secret"><p class="s-top">${top}</p><p class="s-main">${esc(main)}</p><p class="s-sub">${sub}</p></div>
+          <div class="secret"><p class="s-top${imp ? ' imp' : ''}">${top}</p><p class="s-main">${esc(main)}</p><p class="s-sub">${sub}</p></div>
           <div class="cover"><div class="press">${ICON.finger}<span>Przytrzymaj</span></div></div>
         </div>
         <button class="big next" type="button" ${g.seen ? '' : 'disabled'}>${last ? 'Zaczynamy!' : 'Dalej'}</button>
@@ -406,7 +406,7 @@
     $app.innerHTML = `${stripe}
       <main class="screen result">
         <div class="who">
-          <p class="for">${imps.length > 1 ? 'Impostorzy to' : 'Impostor to'}</p>
+          <p class="for imp">${imps.length > 1 ? 'Impostorzy to' : 'Impostor to'}</p>
           <p class="name">${imps.join(' i ')}</p>
         </div>
         <div class="card static">
