@@ -1,0 +1,12 @@
+# Hasła, które gracze już znają (przykłady z rozmowy) i hasła z trybu testowego.
+# Nie mogą trafić do prawdziwej puli.
+Kasztany
+Kasztan
+Kaktus
+Lody
+Parasol
+Piórnik
+Test
+Źdźbło
+Próba
+Przykład
