@@ -7,6 +7,7 @@
 //   node tools/words.mjs stats
 //   node tools/words.mjs check plik.json [--pokaz]
 //   node tools/words.mjs add plik.json [--pokaz]
+//   node tools/words.mjs update poprawki.json [--pokaz]   ([{ "id", "w", "h" }], ID zostaje)
 //   node tools/words.mjs remove ID [ID...]
 //   node tools/words.mjs export wyjscie.json      (nie commituj wyniku!)
 //
@@ -118,6 +119,30 @@ if (cmd === 'stats') {
     save(d);
     console.log(`Dodano ${list.length}. Haseł w puli: ${d.items.length}.`);
   }
+} else if (cmd === 'update') {
+  // Poprawia istniejące hasła, zachowując ich ID: [{ "id": 5, "w": "...", "h": "..." }]
+  const list = JSON.parse(fs.readFileSync(files[0], 'utf8'));
+  const d = load();
+  const byId = new Map(d.items.map((it) => [it[0], it]));
+  const missing = list.filter((e) => !byId.has(e.id));
+  if (missing.length) {
+    console.log(`Brak ID w puli: ${missing.map((e) => e.id).join(', ')}. Nic nie zmieniono.`);
+    process.exit(1);
+  }
+  const others = d.items.filter((it) => !list.some((e) => e.id === it[0]));
+  const res = validate(list, others);
+  report(res, show);
+  if (res.errors.length) {
+    console.log('Nic nie zmieniono — popraw błędy.');
+    process.exit(1);
+  }
+  for (const e of list) {
+    const it = byId.get(e.id);
+    it[1] = e.w.trim();
+    it[2] = e.h.trim();
+  }
+  save(d);
+  console.log(`Poprawiono ${list.length}. Haseł w puli: ${d.items.length}.`);
 } else if (cmd === 'remove') {
   const ids = new Set(files.map(Number));
   const d = load();
@@ -130,5 +155,5 @@ if (cmd === 'stats') {
   fs.writeFileSync(files[0], JSON.stringify(d.items.map(([id, w, h]) => ({ id, w, h })), null, 1));
   console.log(`Zapisano ${d.items.length} haseł do ${files[0]}. Nie commituj tego pliku.`);
 } else {
-  console.log('Użycie: stats | check plik.json | add plik.json | remove ID... | export plik.json');
+  console.log('Użycie: stats | check plik.json | add plik.json | update plik.json | remove ID... | export plik.json');
 }

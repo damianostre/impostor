@@ -240,12 +240,26 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
 }
 .cta .why { text-align: center; font-size: 18px; color: var(--mist); margin-top: 8px; }
 
+/* ---------- rozdawanie ról ---------- */
+.reveal { gap: 14px; }
+.reveal .bar { display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; }
+.reveal .bar .for { text-align: center; font-size: 20px; font-weight: 700; color: var(--mist); }
+.reveal .bar .count { text-align: right; }
+.reveal > .name {
+  margin-top: -8px;
+  text-align: center;
+  font-size: clamp(42px, 13vw, 64px);
+  font-weight: 800;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
 /* ---------- karta z hasłem ---------- */
 .card {
+  --zone: clamp(96px, 30%, 170px); /* dolny pas na palec; hasło pokazuje się nad nim */
   position: relative;
   flex: 1;
-  min-height: 250px;
-  max-height: 470px;
+  min-height: 300px;
   border-radius: 34px;
   background: var(--paper);
   color: var(--ink);
@@ -259,13 +273,13 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
 }
 .secret {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--zone) 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 24px;
+  padding: 24px 20px 6px;
   text-align: center;
   visibility: hidden;
 }
@@ -296,26 +310,35 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
 .cover {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
   background-color: var(--paper);
   background-image: var(--envelope);
   background-position: center;
 }
-.card.open .cover { opacity: 0; transform: scale(1.08); transition: opacity 0.09s ease-out, transform 0.12s ease-out; }
+.card.open .cover { opacity: 0; transition: opacity 0.1s ease-out; }
 .press {
+  position: absolute;
+  left: 50%;
+  bottom: max(calc(var(--zone) / 2), 74px);
+  transform: translate(-50%, 50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 20px 28px 16px;
-  border-radius: 30px;
+  gap: 6px;
+  padding: 14px 26px 10px;
+  border-radius: 28px;
   background: var(--paper);
-  color: var(--kobalt);
   box-shadow: 0 0 0 4px var(--kobalt);
+  white-space: nowrap;
+  transition: transform 0.1s;
 }
-.press svg { width: 62px; height: 62px; }
-.press span { font-size: 25px; font-weight: 800; color: var(--ink); }
+.card.arming .press { transform: translate(-50%, 50%) scale(0.95); }
+.ring { position: relative; width: 76px; height: 76px; display: grid; place-items: center; color: var(--kobalt); }
+.ring > svg:not(.ring-svg) { width: 44px; height: 44px; }
+.ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { fill: none; stroke: var(--mist); stroke-width: 7; }
+.ring .prog { fill: none; stroke: var(--kobalt); stroke-width: 7; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+.card.arming .ring .prog { stroke-dashoffset: 0; transition: stroke-dashoffset var(--hold-ms, 1200ms) linear; }
+.press-label { font-size: 23px; font-weight: 800; color: var(--ink); }
 
 .card.static {
   flex: none;
@@ -353,20 +376,30 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
 @media (max-height: 740px) {
   .screen { gap: 14px; }
   .bar { min-height: 44px; }
-  .reveal .who .for, .play .who .for { font-size: 18px; }
-  .reveal .who .name, .result .who .name { font-size: clamp(38px, 12vw, 56px); }
+  .reveal .bar .for, .play .who .for { font-size: 18px; }
+  .reveal > .name, .result .who .name { font-size: clamp(38px, 12vw, 56px); }
   .result .who { margin-top: 4px; }
   .card.static { padding: 18px 18px 20px; gap: 4px; }
   .actions { gap: 10px; }
   .big { min-height: 64px; font-size: 28px; }
   .big.ghost { min-height: 54px; font-size: 22px; }
-  .card { min-height: 190px; border-radius: 28px; }
-  .secret { padding: 16px; gap: 6px; }
+  .card { min-height: 230px; border-radius: 28px; }
+  .secret { padding: 16px 16px 4px; gap: 6px; }
+  .ring { width: 62px; height: 62px; }
+  .ring > svg:not(.ring-svg) { width: 36px; height: 36px; }
+  .press { padding: 12px 22px 8px; bottom: max(calc(var(--zone) / 2), 64px); }
+  .press-label { font-size: 21px; }
 }
 @media (max-height: 580px) {
-  .reveal .who .for { font-size: 16px; }
-  .reveal .who .name { font-size: 36px; }
-  .card { min-height: 160px; }
+  .reveal .bar .for { font-size: 16px; }
+  .reveal > .name { font-size: 36px; }
+  .card { min-height: 190px; --zone: clamp(84px, 32%, 170px); }
+  .secret { padding-top: 10px; }
+  .s-sub { display: none; }
+  .ring { width: 52px; height: 52px; }
+  .ring > svg:not(.ring-svg) { width: 30px; height: 30px; }
+  .press { padding: 10px 18px 6px; bottom: max(calc(var(--zone) / 2), 56px); }
+  .press-label { font-size: 19px; }
   .s-top { font-size: 20px; }
   .s-top.imp { font-size: 22px; }
   .s-sub { font-size: 16px; }
@@ -379,4 +412,5 @@ h2 { font-size: 26px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   /* pasek postępu przytrzymania zostaje, bo to informacja, a nie ozdoba */
   .hold.holding .fill { transition: transform var(--hold-ms, 1200ms) linear !important; }
+  .card.arming .ring .prog { transition: stroke-dashoffset var(--hold-ms, 1200ms) linear !important; }
 }

@@ -352,28 +352,47 @@
       <main class="screen reveal">
         <header class="bar">
           <button class="icon-btn quit" type="button" aria-label="Przerwij grę">${ICON.x}</button>
+          <p class="for">Telefon dla</p>
           <span class="count">${i + 1} z ${total}</span>
         </header>
-        <div class="who"><p class="for">Telefon dla</p><p class="name">${esc(g.names[i])}</p></div>
-        <div class="card" tabindex="0" role="button" aria-label="Przytrzymaj, żeby zobaczyć">
+        <p class="name">${esc(g.names[i])}</p>
+        <div class="card" tabindex="0" role="button" aria-label="Przytrzymaj, żeby zobaczyć" style="--hold-ms:${HOLD_MS}ms">
           <div class="secret"><p class="s-top${imp ? ' imp' : ''}">${top}</p><p class="s-main">${esc(main)}</p><p class="s-sub">${sub}</p></div>
-          <div class="cover"><div class="press">${ICON.finger}<span>Przytrzymaj</span></div></div>
+          <div class="cover">
+            <div class="press">
+              <span class="ring"><svg class="ring-svg" viewBox="0 0 80 80" aria-hidden="true"><circle class="track" cx="40" cy="40" r="36"/><circle class="prog" cx="40" cy="40" r="36" pathLength="100"/></svg>${ICON.finger}</span>
+              <span class="press-label">Przytrzymaj</span>
+            </div>
+          </div>
         </div>
         <button class="big next" type="button" ${g.seen ? '' : 'disabled'}>${last ? 'Zaczynamy!' : 'Dalej'}</button>
       </main>`;
 
+    // Hasło pokazuje się dopiero po HOLD_MS przytrzymania (kółko się wypełnia),
+    // a chowa od razu po puszczeniu. Pokazuje się w górnej części karty,
+    // żeby palec trzymany na dole go nie zasłaniał.
     const card = $app.querySelector('.card');
     const next = $app.querySelector('.next');
+    let timer = null;
+    let opened = false;
     holdable(card, () => {
-      fit(card.querySelector('.s-main')); // na wypadek zmiany rozmiaru ekranu
-      card.classList.add('open');
+      opened = false;
+      card.classList.add('arming');
+      timer = setTimeout(() => {
+        timer = null;
+        fit(card.querySelector('.s-main')); // na wypadek zmiany rozmiaru ekranu
+        card.classList.add('open');
+        opened = true;
+      }, HOLD_MS);
     }, () => {
-      card.classList.remove('open');
-      if (!g.seen) {
+      if (timer) { clearTimeout(timer); timer = null; }
+      card.classList.remove('arming', 'open');
+      if (opened && !g.seen) {
         g.seen = true;
         saveGame();
         next.disabled = false;
       }
+      opened = false;
     });
     next.addEventListener('click', () => {
       if (!g.seen) return;
